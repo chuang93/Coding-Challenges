@@ -1,0 +1,77 @@
+Answers to Yesware coding challenge!
+1. The unique count of full names, last names and first names is: 47470 | 459 | 3006 respectively.
+2. The 10 most common last names are : 
+Barton: 143
+Lang: 136
+Ortiz: 135
+Hilll: 134
+Hills: 130
+Terry: 129
+Johns: 128
+Crist: 127
+Davis: 126
+Herman: 125
+3. The  10 most common first names are: 
+Andreanne: 31
+Keon: 30
+Heath: 29
+Baron: 28
+Johanna: 27
+Sydni: 26
+Jordan: 25
+Elmer: 24
+Reyna: 23
+Delpha: 22
+The unique names list and then modified names list are: 
+1: Graham, Mckenna
+2: Marvin, Garfield
+3: Lang, Agustina
+4: Bradtke, Nikko
+5: Adams, Luis
+6: Lehner, Matilde
+7: Ortiz, Anita
+8: Koch, Berry
+9: Cartwright, Nicolas
+10: Fisher, Elmo
+11: Kunze, Gertrude
+12: Stanton, Davin
+13: Runolfsdottir, Roy
+14: Rogahn, Colby
+15: Tromp, Ryley
+16: Hoppe, Stanley
+17: Shanahan, Bethel
+18: Hills, Samanta
+19: Lynch, Norma
+20: Bahringer, Lennie
+21: Tillman, Madison
+22: Stoltenberg, Donna
+23: Dickinson, Sonya
+24: Bechtelar, Jane
+25: Pfannerstill, Filomena
+
+1: Filomena, Graham
+2: Mckenna, Marvin
+3: Garfield, Lang
+4: Agustina, Bradtke
+5: Nikko, Adams
+6: Luis, Lehner
+7: Matilde, Ortiz
+8: Anita, Koch
+9: Berry, Cartwright
+10: Nicolas, Fisher
+11: Elmo, Kunze
+12: Gertrude, Stanton
+13: Davin, Runolfsdottir
+14: Roy, Rogahn
+15: Colby, Tromp
+16: Ryley, Hoppe
+17: Stanley, Shanahan
+18: Bethel, Hills
+19: Samanta, Lynch
+20: Norma, Bahringer
+21: Lennie, Tillman
+22: Madison, Stoltenberg
+23: Donna, Dickinson
+24: Sonya, Bechtelar
+25: Jane, Pfannerstill
+Thank You for Reviewing my Code! Please read the README.TXT for some brief details.

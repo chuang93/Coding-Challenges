@@ -1,0 +1,228 @@
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.*;
+import java.util.*;
+import java.lang.*;
+import java.util.zip.*;
+import java.util.HashMap;
+
+class mapComparatorDescending implements Comparator<String>{
+
+    HashMap<String, Integer> map = new HashMap<String, Integer>();
+
+    public mapComparatorDescending(HashMap<String, Integer> map){
+        this.map.putAll(map);
+    }
+    @Override
+    public int compare(String keyOne, String keyTwo) {
+        return map.get(keyTwo).compareTo(map.get(keyOne));
+    }
+}
+
+public class NameLists {
+    private int fullNameCount,lastNameCount,firstNameCount;
+    private HashMap<String,Integer>uniqueLastNames;
+    private HashMap<String,Integer>uniqueFirstNames;
+    private HashSet<String>uniqueFullNames;
+    private ArrayList<String> completeUniqueNames;
+    private ArrayList<String> modifiedNames;
+
+    public NameLists(){
+        this.fullNameCount=0;
+        this.lastNameCount=0;
+        this.firstNameCount=0;
+        this.uniqueLastNames=new HashMap<String,Integer>();
+        this.uniqueFirstNames=new HashMap<String,Integer>();
+        this.uniqueFullNames=new HashSet<String>();
+        this.completeUniqueNames=new ArrayList<String>();
+        this.modifiedNames=new ArrayList<String>();
+
+    }
+
+    private String decompressToTextFile(String compressedSampleFileName, String decompressedFileName){
+
+        OutputStream decompressedFileStream;
+        GZIPInputStream gZipInputStream;
+
+        try{
+            FileInputStream inputFileStream= new FileInputStream(compressedSampleFileName);
+            gZipInputStream= new GZIPInputStream(inputFileStream);
+
+            decompressedFileStream = new FileOutputStream(decompressedFileName);
+            byte[] buffer = new byte[1024 * 4];
+            int len;
+            while ((len = gZipInputStream.read(buffer)) > 0) {
+                decompressedFileStream.write(buffer, 0, len);
+            }
+        }
+        catch (IOException e) {
+            System.out.println("Error during text-conversion process: "+ e.getLocalizedMessage());
+        }
+        return decompressedFileName;
+    }
+
+    private static boolean isFullNameValid(String fullName){
+        String validNamePattern= "^[A-Z][a-z]+[,]\\s[A-Z][a-z]+$";
+        return fullName.matches(validNamePattern);
+    }
+
+    private void addToFullNameSet(String fullNameFormatted){
+            this.uniqueFullNames.add(fullNameFormatted);
+    }
+
+    //booleans allow for unit testing for duplicates if a testing suite was implemented.
+
+    private boolean addToLastNameSet(String lastName){
+        if (this.uniqueLastNames.containsKey(lastName)){
+
+            this.uniqueLastNames.put(lastName,this.uniqueLastNames.get(lastName)+1);
+            return false;
+        }
+        else {
+            this.uniqueLastNames.put(lastName,1);
+            return true;
+        }
+    }
+
+    private boolean addToFirstNameSet(String firstName){
+        if (this.uniqueFirstNames.containsKey(firstName)){
+
+            this.uniqueFirstNames.put(firstName,this.uniqueFirstNames.get(firstName)+1);
+            return false;
+        }
+        else {
+            this.uniqueFirstNames.put(firstName,1);
+            return true;
+        }
+    }
+
+    private TreeMap<String, Integer> getSortedMapByValue(HashMap<String, Integer> nameHashMap){
+        Comparator<String> comparator = new mapComparatorDescending(nameHashMap);
+        TreeMap<String, Integer> descendingMap = new TreeMap<String, Integer>(comparator);
+        descendingMap.putAll(nameHashMap);
+        return descendingMap;
+    }
+
+    private void printSortedNames(TreeMap<String,Integer> nameMap){
+        int i=0;
+        for (String mapKey:nameMap.keySet()){
+
+            System.out.println(mapKey +": "+nameMap.get(mapKey));
+            i++;
+            if (i>9){break;}
+        }
+    }
+
+    private boolean addToCompleteUniqueNames(String fullNameFormatted, String lastName, String firstName){
+        if(this.uniqueLastNames.containsKey(lastName)||this.uniqueFirstNames.containsKey(firstName)){
+            return false;
+        }
+        else{
+            this.completeUniqueNames.add(fullNameFormatted);
+            return true;
+        }
+    }
+    private void createModifiedNameList(ArrayList<String> nameList){
+        //modified list is all last names become first names of next element (wrap around too) and all first names become next last names.
+
+        String lastName;
+        String firstName;
+        String[] lastNameHolder;
+        String[] firstNameHolder;
+
+        try{
+            String newFirstName=nameList.get(0).split(", ")[0];
+            String newLastName=nameList.get(nameList.size()-1).split(", ")[1];
+            this.modifiedNames.add(newLastName+", "+newFirstName);
+            for (int i=0;i< nameList.size()-1;i++){
+                lastNameHolder = nameList.get(i).split(", ");
+                firstNameHolder= nameList.get(i+1).split(", ");
+                lastName = lastNameHolder[1];
+                firstName = firstNameHolder[0];
+                this.modifiedNames.add(lastName+", "+firstName);
+            }
+        }
+        catch(Exception ex){
+            System.out.println("error in analyzing unique Lists, check that input is format [Lastname, FirstName]");
+        }
+
+    }
+
+    private void printUniqueAndModifiedLists(){
+        System.out.println("The unique names list and then modified names list are: ");
+        for(int i=0; i<this.completeUniqueNames.size();i++){
+            System.out.println(i+1+": "+this.completeUniqueNames.get(i));
+        }
+        System.out.println();
+        for(int j=0; j<this.modifiedNames.size();j++){
+            System.out.println(j+1+": "+this.modifiedNames.get(j));
+        }
+    }
+
+    private String uniqueCountAnswer(){
+        return "1. The unique count of full names, last names and first names is: " + this.uniqueFullNames.size()+ " | "
+                + this.uniqueLastNames.size() + " | " + this.uniqueFirstNames.size() + " respectively.";
+    }
+    private boolean isUniqueNameListFull(){
+        return completeUniqueNames.size()>=25;
+    }
+
+    private void analyzeFileForCountsAndLists(String textFileName){
+        String fullNameFormatted;
+        String lastName;
+        String firstName;
+
+        try {
+
+            FileReader inputFile = new FileReader(textFileName);
+            Scanner scanFile=new Scanner(inputFile);
+
+            
+            while(scanFile.hasNextLine()){
+                String nameLine=scanFile.nextLine();
+
+                fullNameFormatted=nameLine.split(" --")[0];
+                //  System.out.println(fullNameFormatted);
+                // uncomment this line to see all possible names without filter for testing/debugging.
+                if (isFullNameValid(fullNameFormatted)) {
+
+                    this.addToFullNameSet(fullNameFormatted);
+                    String[] lastAndFirstName = fullNameFormatted.split(", ");
+                    lastName = lastAndFirstName[0];
+                    firstName = lastAndFirstName[1];
+                        if(!isUniqueNameListFull()) {
+                            this.addToCompleteUniqueNames(fullNameFormatted, lastName, firstName);
+                        }
+                    this.addToLastNameSet(lastName);
+                    this.addToFirstNameSet(firstName);
+
+                }
+
+                scanFile.nextLine();
+           }
+        }
+        catch(Exception ex){
+            System.out.println(ex.getMessage());
+        }
+
+    }
+
+
+    public static void main(String[] args){
+            NameLists actorList= new NameLists();
+            String textFileName=actorList.decompressToTextFile("yesware-test-data-v1-6.txt.gz","yesware-textfile.txt");
+            actorList.analyzeFileForCountsAndLists(textFileName);
+            System.out.println("Answers to Yesware coding challenge!");
+            System.out.println(actorList.uniqueCountAnswer());
+            TreeMap<String,Integer> sortedLastNames=actorList.getSortedMapByValue(actorList.uniqueLastNames);
+            TreeMap<String,Integer> sortedFirstNames=actorList.getSortedMapByValue(actorList.uniqueFirstNames);
+            System.out.println("2. The 10 most common last names are : ");
+            actorList.printSortedNames(sortedLastNames);
+            System.out.println("3. The  10 most common first names are: ");
+            actorList.printSortedNames(sortedFirstNames);
+            actorList.createModifiedNameList(actorList.completeUniqueNames);
+            actorList.printUniqueAndModifiedLists();
+            System.out.println("Thank You for Reviewing my Code! Please read the README.TXT for some brief details.");
+    }
+            }
